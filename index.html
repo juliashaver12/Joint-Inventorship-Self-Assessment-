@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joint Inventorship Self-Assessment</title>
+  <meta name="description" content="A guided interview for researchers and academics to assess whether their contribution may support a joint inventorship claim.">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    /* =========================================================
+       DESIGN TOKENS
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-text-primary:        #2C2C2A;
+      --color-text-secondary:      #5F5E5A;
+      --color-text-tertiary:       #888780;
+      --color-bg-primary:          #ffffff;
+      --color-bg-secondary:        #F1EFE8;
+      --color-border-tertiary:     rgba(44,44,42,0.15);
+      --color-border-secondary:    rgba(44,44,42,0.3);
+      --border-radius-md:          8px;
+      --border-radius-lg:          12px;
+
+      --color-purple:              #534AB7;
+      --color-purple-dark:         #3C3489;
+      --color-purple-light:        #EEEDFE;
+      --color-purple-border:       #AFA9EC;
+      --color-purple-text:         #26215C;
+
+      --color-teal:                #1D9E75;
+      --color-teal-light:          #E1F5EE;
+      --color-teal-border:         #5DCAA5;
+      --color-teal-text:           #04342C;
+      --color-teal-text-body:      #085041;
+      --color-teal-hover:          #9FE1CB;
+
+      --color-amber-bg:            #FAEEDA;
+      --color-amber-border:        #EF9F27;
+      --color-amber-title:         #412402;
+      --color-amber-body:          #633806;
+
+      --color-red-bg:              #FCEBEB;
+      --color-red-border:          #F09595;
+      --color-red-title:           #501313;
+      --color-red-body:            #791F1F;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-text-primary:     #E8E6DE;
+        --color-text-secondary:   #B4B2A9;
+        --color-text-tertiary:    #888780;
+        --color-bg-primary:       #1C1C1A;
+        --color-bg-secondary:     #2C2C2A;
+        --color-border-tertiary:  rgba(232,230,222,0.15);
+        --color-border-secondary: rgba(232,230,222,0.3);
+      }
+    }
+
+    /* =========================================================
+       BASE
+       ========================================================= */
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    #app-container {
+      max-width: 620px;
+      margin: 0 auto;
+      background: var(--color-bg-primary);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem 1.5rem;
+      border: 0.5px solid var(--color-border-tertiary);
+    }
+
+    /* =========================================================
+       TYPOGRAPHY — OPENING PAGE
+       section-heading: larger, darker, more prominent than the
+       old section-label style
+       ========================================================= */
+    .app-title    { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+    .app-subtitle { font-size: 13px; color: var(--color-text-tertiary); margin-bottom: 1.5rem; }
+
+    /* Punchy section headings on opening page */
+    .section-heading {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 1.5rem 0 8px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Punchy section headings on conclusion pages */
+    .conclusion-section-heading {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin: 1.25rem 0 8px;
+      letter-spacing: -0.01em;
+    }
+
+    /* Smaller uppercase label used in interview questions */
+    .section-label {
+      font-size: 11px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--color-text-tertiary);
+      margin: 1.5rem 0 6px;
+    }
+
+    .body-text       { font-size: 14px; color: var(--color-text-primary);   line-height: 1.7; margin-bottom: 0.85rem; }
+    .body-text-muted { font-size: 13px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 0.85rem; }
+
+    /* Bold inline terms in authorship section */
+    .body-text-muted strong,
+    .body-text strong { color: var(--color-text-primary); }
+
+    .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.25rem 0; }
+
+    /* =========================================================
+       DISCLAIMER BOX
+       ========================================================= */
+    .disclaimer-box {
+      background: var(--color-amber-bg);
+      border: 0.5px solid var(--color-amber-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .disclaimer-title { font-size: 13px; font-weight: 500; color: var(--color-amber-title); margin-bottom: 8px; }
+    .disclaimer-body  { font-size: 13px; color: var(--color-amber-body); line-height: 1.6; }
+    .disclaimer-body div { margin-bottom: 8px; }
+    .disclaimer-body div:last-child { margin-bottom: 0; }
+
+    /* =========================================================
+       ACKNOWLEDGMENT CHECKBOX
+       ========================================================= */
+    .ack-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin: 1.25rem 0; cursor: pointer; user-select: none;
+    }
+    .ack-box {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border: 1.5px solid var(--color-border-secondary);
+      border-radius: 4px; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .ack-box.checked { background: var(--color-purple); border-color: var(--color-purple); }
+    .ack-check { display: none; width: 10px; height: 10px; }
+    .ack-box.checked .ack-check { display: block; }
+    .ack-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+    /* =========================================================
+       BEGIN BUTTON
+       ========================================================= */
+    .begin-btn {
+      display: block; width: 100%; padding: 16px;
+      background: var(--color-purple); border: none;
+      border-radius: var(--border-radius-lg);
+      font-size: 16px; font-weight: 500; color: #fff;
+      cursor: pointer; text-align: center; margin-top: 1rem;
+      opacity: 0.35; transition: opacity 0.2s, background 0.2s;
+    }
+    .begin-btn.enabled       { opacity: 1; }
+    .begin-btn.enabled:hover { background: var(--color-purple-dark); }
+
+    /* =========================================================
+       TOOLTIP
+       ========================================================= */
+    .tooltip-anchor {
+      color: var(--color-purple);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      cursor: pointer;
+      position: relative;
+      display: inline;
+    }
+    .tooltip-qmark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--color-purple);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1;
+      margin-left: 3px;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+    }
+    .tooltip-bubble {
+      display: none;
+      position: absolute; left: 0; top: 24px; width: 280px;
+      background: var(--color-bg-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 12px 14px;
+      font-size: 12px; color: var(--color-text-secondary); line-height: 1.6;
+      z-index: 10; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      /* Tooltip text should not be underlined */
+      text-decoration: none;
+    }
+    .tooltip-bubble.visible { display: block; }
+    .tooltip-title { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+
+    /* =========================================================
+       PROGRESS DOTS
+       ========================================================= */
+    .progress     { display: flex; gap: 4px; margin-bottom: 24px; }
+    .progress-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); }
+    .progress-dot.done   { background: var(--color-purple); }
+    .progress-dot.active { background: #7F77DD; }
+
+    /* =========================================================
+       BACK BUTTON
+       ========================================================= */
+    .back-btn {
+      font-size: 12px; color: var(--color-text-tertiary);
+      background: none; border: none; cursor: pointer;
+      padding: 0; margin-bottom: 16px; display: none;
+    }
+    .back-btn:hover { color: var(--color-text-secondary); }
+
+    /* =========================================================
+       QUESTION AREA
+       ========================================================= */
+    .q-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); margin-bottom: 8px; }
+    .q-text  { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; line-height: 1.5; }
+    .q-sub   { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 20px; line-height: 1.5; }
+
+    .opt-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 12px 16px; margin-bottom: 8px;
+      background: var(--color-bg-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      font-size: 14px; color: var(--color-text-primary);
+      cursor: pointer; line-height: 1.4;
+      transition: background 0.15s;
+    }
+    .opt-btn:hover { background: var(--color-bg-secondary); }
+
+    /* =========================================================
+       OUTCOME CARDS
+       ========================================================= */
+    .stop-card {
+      background: var(--color-red-bg);
+      border: 0.5px solid var(--color-red-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem; margin-top: 8px;
+    }
+    .stop-title { font-size: 15px; font-weight: 500; color: var(--color-red-title); margin-bottom: 6px; }
+    .stop-body  { font-size: 13px; color: var(--color-red-body); line-height: 1.5; }
+
+    .continue-card {
+      background: var(--color-teal-light);
+      border: 0.5px solid var(--color-teal-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem; margin-bottom: 1.5rem;
+    }
+    .continue-title { font-size: 15px; font-weight: 500; color: var(--color-teal-text); margin-bottom: 6px; }
+    .continue-body  { font-size: 13px; color: var(--color-teal-text-body); line-height: 1.5; }
+
+    .flag-card {
+      background: var(--color-amber-bg);
+      border: 0.5px solid var(--color-amber-border);
+      border-radius: var(--border-radius-lg);
+      padding: 1.25rem; margin-top: 8px;
+    }
+    .flag-title { font-size: 15px; font-weight: 500; color: var(--color-amber-title); margin-bottom: 6px; }
+    .flag-body  { font-size: 13px; color: var(--color-amber-body); line-height: 1.5; }
+
+    /* =========================================================
+       ACTION BUTTONS
+       ========================================================= */
+    .action-btn {
+      margin-top: 12px; padding: 10px 20px;
+      background: var(--color-bg-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      font-size: 14px; color: var(--color-text-primary);
+      cursor: pointer; display: inline-block;
+      transition: background 0.15s;
+    }
+    .action-btn:hover { background: var(--color-bg-secondary); }
+
+    .action-btn.primary {
+      background: var(--color-purple-light);
+      border-color: var(--color-purple-border);
+      color: var(--color-purple-text);
+    }
+    .action-btn.primary:hover { background: #CECBF6; }
+
+    .action-btn.print-btn {
+      background: var(--color-teal-light);
+      border-color: var(--color-teal-border);
+      color: var(--color-teal-text);
+    }
+    .action-btn.print-btn:hover { background: var(--color-teal-hover); }
+
+    .nav-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+
+    /* =========================================================
+       CONCLUSION
+       ========================================================= */
+    .progress-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 20px; }
+
+    .doc-item {
+      display: flex; gap: 10px; padding: 10px 14px; margin-bottom: 6px;
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius-md);
+      font-size: 13px; color: var(--color-text-primary); line-height: 1.5;
+    }
+    .doc-bullet {
+      flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--color-teal); margin-top: 6px;
+    }
+
+    .link-block {
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .link-block--clickable {
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .link-block--clickable:hover {
+      background: var(--color-bg-secondary);
+      border-color: var(--color-border-secondary);
+    }
+    .link-block-anchor {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .link-block-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .link-title       { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+    .link-arrow       { font-size: 13px; color: var(--color-text-tertiary); }
+    .link-description { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 2px; }
+    .link-url         { font-size: 12px; color: var(--color-purple); }
+
+    .tip-block {
+      background: var(--color-bg-secondary);
+      border-radius: var(--border-radius-md);
+      padding: 14px 16px; margin-bottom: 10px;
+      font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;
+    }
+
+    /* =========================================================
+       GETTING STARTED PAGES
+       ========================================================= */
+    .gs-heading {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    .gs-subheading {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Contribution textarea */
+    .contribution-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: vertical;
+      min-height: 140px;
+      transition: border-color 0.15s;
+    }
+    .contribution-textarea:focus {
+      outline: none;
+      border-color: var(--color-purple);
+    }
+    .contribution-textarea::placeholder {
+      color: var(--color-text-tertiary);
+    }
+
+    /* =========================================================
+       RESUME MODAL
+       ========================================================= */
+    #modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #resume-modal {
+      background: var(--color-bg-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.75rem 1.5rem;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    #resume-modal-title {
+      font-size: 16px; font-weight: 500; color: var(--color-text-primary);
+      margin-bottom: 10px;
+    }
+
+    #resume-modal-body {
+      font-size: 13px; color: var(--color-text-secondary);
+      line-height: 1.6; margin-bottom: 4px;
+    }
+
+    .modal-btn-row {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 20px;
+    }
+
+    #resume-btn {
+      width: 100%; padding: 12px 20px;
+      background: var(--color-purple); border: none;
+      border-radius: var(--border-radius-md);
+      font-size: 14px; font-weight: 500; color: #fff;
+      cursor: pointer; text-align: center;
+      transition: background 0.15s;
+    }
+    #resume-btn:hover { background: var(--color-purple-dark); }
+
+    #modal-restart-btn {
+      width: 100%; padding: 12px 20px;
+      background: var(--color-bg-primary);
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      font-size: 14px; color: var(--color-text-secondary);
+      cursor: pointer; text-align: center;
+      transition: background 0.15s;
+    }
+    #modal-restart-btn:hover { background: var(--color-bg-secondary); }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     RESUME SESSION MODAL
+     ============================================================ -->
+<div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resume-modal-title">
+  <div id="resume-modal" tabindex="-1">
+    <div id="resume-modal-title"></div>
+    <div id="resume-modal-body"></div>
+    <div class="modal-btn-row">
+      <button id="resume-btn"        onclick="resumeSession()"></button>
+      <button id="modal-restart-btn" onclick="restartFull()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN APP CONTAINER
+     ============================================================ -->
+<div id="app-container">
+
+  <!-- ---- OPENING PAGE ---- -->
+  <div id="opening" style="display:block">
+    <div class="app-title"    id="app-title"></div>
+    <div class="app-subtitle" id="app-subtitle"></div>
+
+    <div id="opening-sections"></div>
+
+    <div class="disclaimer-box">
+      <div class="disclaimer-title" id="disclaimer-title"></div>
+      <div class="disclaimer-body"  id="disclaimer-body"></div>
+    </div>
+
+    <div class="ack-row" onclick="toggleAck()" role="checkbox" aria-checked="false" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' ')toggleAck()">
+      <div class="ack-box" id="ack-box">
+        <svg class="ack-check" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="ack-text" id="ack-text"></div>
+    </div>
+
+    <button class="begin-btn" id="begin-btn" onclick="startInterview()" disabled></button>
+  </div>
+
+  <!-- ---- GETTING STARTED ---- -->
+  <div id="getting-started" style="display:none">
+    <div id="getting-started-area"></div>
+  </div>
+
+  <!-- ---- INTERVIEW ---- -->
+  <div id="interview" style="display:none">
+    <div id="progress-bar" class="progress"></div>
+    <button class="back-btn" id="back-btn" onclick="goBack()">← Back</button>
+    <div id="question-area"></div>
+  </div>
+
+  <!-- ---- CONCLUSION ---- -->
+  <div id="conclusion" style="display:none">
+    <button class="back-btn" id="conclusion-back-btn" style="display:none">← Back</button>
+    <div id="conclusion-area"></div>
+  </div>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
